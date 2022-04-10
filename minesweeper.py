@@ -57,17 +57,49 @@ class Game:
         self.clicked = []
         self.flaged = []
 
-    def dfs(self, x, y, vis):
-        if [x, y] in self.flaged:
+    def dfs(self, x, y):
+        if x < 0 or y < 0 or x >= self.field.W or y >= self.field.H:
             return
-        if self.field.data[y][x] == -1:
-            pass
+        if (x, y) in self.clicked or (x, y) in self.flaged:
+            return
+        
+        point = self.field.data[y][x]
+
+        if point == -1:
+            return
+        elif point != 0:
+            self.clicked.append((x, y))
+        else:
+            self.clicked.append((x, y))
+            self.dfs(x+1, y)
+            self.dfs(x, y+1)
+            self.dfs(x-1, y)
+            self.dfs(x, y-1)
         
 
     def get_vision(self):
-        vis = [[False] * self.field.W for _ in range(self.field.H)]
+        vis = [[0] * self.field.W for _ in range(self.field.H)]
 
         for x, y in self.clicked:
-            self.dfs(x, y, vis)
+            vis[y][x] = self.field.data[y][x]
 
+        return vis
+
+    def on_click(self, x, y):
+        if (x, y) in self.flaged:
+            return
+        if self.field.data[y][x] == -1:
+            return -1
+        elif self.field.data[y][x] != 0:
+            self.clicked.append((x, y))
+        else:
+            self.dfs(x, y)
+
+    def on_flag(self, x, y):
+        if (x, y) in self.flaged:
+            self.flaged.remove((x, y))
+            return
+        if (x, y) not in self.clicked:
+            self.flaged.append((x, y))
+        
     
