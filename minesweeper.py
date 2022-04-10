@@ -6,7 +6,8 @@ class Field:
         self.W = w
         self.H = h
         self.data = [[0] * w for _ in range(h)]
-        self.N = number
+        #data[i][j] is number from -1 to 8 where 0 is empty, -1 is mine, 1-8 is number of mines nearby
+        self.N = number #number of mines 
         self.generate()
         print('field created')
 
@@ -58,6 +59,7 @@ class Game:
         self.flaged = []
 
     def dfs(self, x, y):
+        #cascades through all empty blocks
         if x < 0 or y < 0 or x >= self.field.W or y >= self.field.H:
             return
         if (x, y) in self.clicked or (x, y) in self.flaged:

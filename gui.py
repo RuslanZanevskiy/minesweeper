@@ -74,13 +74,13 @@ class App:
         self.win = 0
 
         self.field = ms_core.Field(self.W_TILES, self.H_TILES, round(self.W_TILES * self.H_TILES * 0.15))
+        self.game = ms_core.Game(self.field)
+        
         for row in self.field.data:
             for col in row:
                 sym = ' ' if col == 0 else '*' if col == -1 else str(col)
                 print(sym, end='')
             print()
-        
-        self.game = ms_core.Game(self.field)
 
         while self.is_running:
             self.clock.tick(self.FPS)
@@ -106,6 +106,8 @@ class App:
         print()
         print(f'Time - {m}:{(str(0) + str(s)) if s < 10 else s}')
 
+
+        #shows all mines and blocks
         self.game.clicked = []
         for x in range(self.field.W):
             for y in range(self.field.H):
