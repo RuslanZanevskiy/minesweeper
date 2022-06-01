@@ -1,19 +1,21 @@
 import random
 import time
 
+from typing import List, Tuple
+
 
 class Field:
-    def __init__(self, w, h, number):
-        self.SEED = round(time.time())
-        self.W = w
-        self.H = h
-        self.data = [[0] * w for _ in range(h)]
+    def __init__(self, w: int, h: int, number: int):
+        self.SEED: int = round(time.time())
+        self.W: int = w
+        self.H: int = h
+        self.data: List[List[int]] = [[0] * w for _ in range(h)]
         #data[i][j] is number from -1 to 8 where 0 is empty, -1 is mine, 1-8 is number of mines nearby
-        self.N = number #number of mines 
+        self.N: int = number #number of mines 
         self.generate()
 
 
-    def get_neighbors(self, x, y):
+    def get_neighbors(self, x: int, y: int) -> int:
         '''Returns a number of neighbors of cell with x, y coords'''
         w, h = self.W, self.H
         nei = 0
@@ -56,19 +58,19 @@ class Field:
         
 
 class Game:
-    def __init__(self, field):
+    def __init__(self, field: Field):
         self.field = field
-        self.clicked = []
-        self.flaged = []
+        self.clicked: List[Tuple[int, int]] = []
+        self.flaged: List[Tuple[int, int]] = []
 
-    def cascade_click(self, x, y):
+    def cascade_click(self, x: int, y: int):
         '''Run through all empty blocks and click on it'''
         if x < 0 or y < 0 or x >= self.field.W or y >= self.field.H:
             return
         if (x, y) in self.clicked or (x, y) in self.flaged:
             return
         
-        point = self.field.data[y][x]
+        point: int = self.field.data[y][x]
 
         if point == -1:
             return
@@ -82,7 +84,7 @@ class Game:
             self.cascade_click(x, y-1)
         
 
-    def get_vision(self):
+    def get_vision(self) -> List[List[int]]:
         '''Gets a vision for player.'''
         vis = [[0] * self.field.W for _ in range(self.field.H)]
 
@@ -92,7 +94,7 @@ class Game:
         return vis
 
 
-    def on_click(self, x, y):
+    def on_click(self, x: int, y: int) -> int:
         '''Handles a left click event'''
         if (x, y) in self.flaged:
             return 1

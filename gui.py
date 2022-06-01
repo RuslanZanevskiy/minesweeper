@@ -7,6 +7,7 @@ import logging
 
 
 LOG_FILENAME = f'minesweeper_log{round(time.time())}.txt'
+
 logging.basicConfig(handlers=[logging.FileHandler(filename=LOG_FILENAME, 
                     mode='w', encoding='utf-8')], 
                     level=logging.DEBUG,
@@ -22,8 +23,8 @@ class App:
         self.clock = pg.time.Clock()
         self.TILE_SIZE = 40
         self.W_TILES, self.H_TILES = self.WIDTH // self.TILE_SIZE, self.HEIGHT // self.TILE_SIZE
-        self.pressed = False #for handling mouse release and mouse down
-        self.first_click = 0 #time of first click(start of game)
+        self.pressed = False # for handling mouse release and mouse down
+        self.first_click = 0 # time of first click(start of game)
         logging.info('App created')
 
 
@@ -33,7 +34,7 @@ class App:
         x //= self.TILE_SIZE 
         y //= self.TILE_SIZE
 
-        if pg.mouse.get_pressed()[0]: #on left click
+        if pg.mouse.get_pressed()[0]: # on left click
             if self.pressed:
                 return
             r = self.game.on_click(x, y)
@@ -41,7 +42,7 @@ class App:
                 self.is_running = False
                 self.win = -1
             self.pressed = True
-        elif pg.mouse.get_pressed()[2]: #on right click
+        elif pg.mouse.get_pressed()[2]: # on right click
             if self.pressed:
                 return
             self.game.on_flag(x, y)
@@ -57,7 +58,7 @@ class App:
         '''Renders a player's vision on the screen'''
         self.screen.fill((200, 200, 200))
 
-        #grid
+        # grid
         for i in range(self.WIDTH):
             pg.draw.line(self.screen, (0, 0, 0), (i * self.TILE_SIZE, 0), (i * self.TILE_SIZE, self.HEIGHT))
         for i in range(self.HEIGHT):
@@ -65,18 +66,19 @@ class App:
 
         hts = self.TILE_SIZE // 2
         ts10 = self.TILE_SIZE // 10
+        # A bit stupid text rendering, but whatever
         font = pg.font.SysFont('arial', round(self.TILE_SIZE / 1.5))
         for y, row in enumerate(self.game.get_vision()):
             for x, col in enumerate(row):
-                if col != 0 or (x, y) in self.game.clicked or (x, y) in self.game.flaged: #clicked background
+                if col != 0 or (x, y) in self.game.clicked or (x, y) in self.game.flaged: # clicked background
                     rect = (x * self.TILE_SIZE+1, y * self.TILE_SIZE+1, self.TILE_SIZE-1, self.TILE_SIZE-1)
                     pg.draw.rect(self.screen, (230, 230, 230), rect)
-                if (x, y) in self.game.flaged: #flags
+                if (x, y) in self.game.flaged: # flags
                     tmp = self.TILE_SIZE // 3
                     pg.draw.rect(self.screen, (0, 0, 0), (x * self.TILE_SIZE + tmp, y * self.TILE_SIZE + tmp, tmp, tmp))
-                elif col == -1: #mines
+                elif col == -1: # mines
                     pg.draw.circle(self.screen, (0, 0, 0), (x * self.TILE_SIZE + hts, y * self.TILE_SIZE + hts), hts // 1.5)
-                elif col != 0: #number blocks
+                elif col != 0: # number blocks
                     text = font.render(str(col), True, (0, 0, 0))
                     self.screen.blit(text, (x * self.TILE_SIZE + hts - ts10 , y * self.TILE_SIZE + ts10))
                     
@@ -104,7 +106,7 @@ class App:
             self.render_frame()
 
             if len(self.game.flaged) == self.field.N and len(self.game.clicked) == needs_to_be_clicked:
-                #if win
+                # if win
                 self.win = 1
                 self.is_running = False
 
@@ -117,7 +119,7 @@ class App:
         m, s = int(record // 60), round(record % 60)
         logging.info(f'Time - {m}:{(str(0) + str(s)) if s < 10 else s}')
 
-        #shows all mines and blocks
+        # shows all mines and blocks
         self.game.clicked = []
         for x in range(self.field.W):
             for y in range(self.field.H):
