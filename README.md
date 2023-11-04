@@ -1,1 +1,1 @@
-# minesweeper on python with pygame
+# Minesweeper in Python with pygame

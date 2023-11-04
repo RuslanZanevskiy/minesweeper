@@ -5,19 +5,20 @@ from typing import List, Tuple
 
 
 class Field:
-    def __init__(self, w: int, h: int, number: int):
+    def __init__(self, width: int, height: int, number_of_mines: int):
         self.SEED: int = round(time.time())
-        self.W: int = w
-        self.H: int = h
-        self.data: List[List[int]] = [[0] * w for _ in range(h)]
+        self.WIDTH: int = width
+        self.HEIGHT: int = height
+        self.data: List[List[int]] = [[0] * width for _ in range(height)]
         #data[i][j] is number from -1 to 8 where 0 is empty, -1 is mine, 1-8 is number of mines nearby
-        self.N: int = number #number of mines 
+        self.NUMBER_OF_MINES: int = number_of_mines #number of mines 
+        
         self.generate()
 
 
     def get_neighbors(self, x: int, y: int) -> int:
         '''Returns a number of neighbors of cell with x, y coords'''
-        w, h = self.W, self.H
+        w, h = self.WIDTH, self.HEIGHT
         nei = 0
         if x != 0 and self.data[y][x-1] == -1:
             nei += 1
@@ -42,16 +43,17 @@ class Field:
     def generate(self):
         '''Generates mines and blocks with numbers on field'''
         random.seed(self.SEED)
-        k = 0 #num of mines
-        while k < self.N:
-            x, y = random.randint(0, self.W-1), random.randint(0, self.H-1) 
+        k = 0 # mines counter
+        while k < self.NUMBER_OF_MINES:
+            x = random.randint(0, self.WIDTH-1)
+            y = random.randint(0, self.HEIGHT-1) 
             if self.data[y][x] != -1:
                 k += 1
                 self.data[y][x] = -1
 
         #generate blocks with numbers
-        for y in range(self.H):
-            for x in range(self.W):
+        for y in range(self.HEIGHT):
+            for x in range(self.WIDTH):
                 if self.data[y][x] != -1:
                     nei = self.get_neighbors(x, y)
                     self.data[y][x] = nei    
@@ -65,7 +67,7 @@ class Game:
 
     def cascade_click(self, x: int, y: int):
         '''Run through all empty blocks and click on it'''
-        if x < 0 or y < 0 or x >= self.field.W or y >= self.field.H:
+        if x < 0 or y < 0 or x >= self.field.WIDTH or y >= self.field.HEIGHT:
             return
         if (x, y) in self.clicked or (x, y) in self.flaged:
             return
@@ -86,7 +88,7 @@ class Game:
 
     def get_vision(self) -> List[List[int]]:
         '''Gets a vision for player.'''
-        vis = [[0] * self.field.W for _ in range(self.field.H)]
+        vis = [[0] * self.field.WIDTH for _ in range(self.field.HEIGHT)]
 
         for x, y in self.clicked:
             vis[y][x] = self.field.data[y][x]
@@ -95,7 +97,12 @@ class Game:
 
 
     def on_click(self, x: int, y: int) -> int:
-        '''Handles a left click event'''
+        '''
+        Handles a left click event
+        returns 1 if clicked on flaged cell
+        return -1 if clicked on mine(game over)
+        return 0 if clicked on basic cell
+        '''
         if (x, y) in self.flaged:
             return 1
         if self.field.data[y][x] == -1: #if click on mine - game over

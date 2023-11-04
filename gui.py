@@ -24,7 +24,7 @@ class App:
         self.TILE_SIZE = 40
         self.W_TILES, self.H_TILES = self.WIDTH // self.TILE_SIZE, self.HEIGHT // self.TILE_SIZE
         self.pressed = False # for handling mouse release and mouse down
-        self.first_click = 0 # time of first click(start of game)
+        self.first_click = -1 # time of first click(start of game)
         logging.info('App created')
 
 
@@ -50,7 +50,7 @@ class App:
         else:
             self.pressed = False
         
-        if self.pressed and self.first_click == 0:
+        if self.pressed and self.first_click == -1:
             self.first_click = time.time()
 
 
@@ -94,7 +94,7 @@ class App:
         self.game = ms_core.Game(self.field)
         logging.info(f'Seed of field is {self.field.SEED}')
         
-        needs_to_be_clicked = self.field.H * self.field.W - self.field.N
+        needs_to_be_clicked = self.field.HEIGHT * self.field.WIDTH - self.field.NUMBER_OF_MINES
 
         while self.is_running:
             self.clock.tick(self.FPS)
@@ -105,7 +105,7 @@ class App:
             self.check_action()
             self.render_frame()
 
-            if len(self.game.flaged) == self.field.N and len(self.game.clicked) == needs_to_be_clicked:
+            if len(self.game.flaged) == self.field.NUMBER_OF_MINES and len(self.game.clicked) == needs_to_be_clicked:
                 # if win
                 self.win = 1
                 self.is_running = False
@@ -121,8 +121,8 @@ class App:
 
         # shows all mines and blocks
         self.game.clicked = []
-        for x in range(self.field.W):
-            for y in range(self.field.H):
+        for x in range(self.field.WIDTH):
+            for y in range(self.field.HEIGHT):
                 if (x, y) not in self.game.flaged:
                     self.game.clicked.append((x, y))
                 else:
@@ -146,3 +146,4 @@ if __name__ == '__main__':
     logging.info('Running app')
     app.run()
     logging.info('App closed')
+    
